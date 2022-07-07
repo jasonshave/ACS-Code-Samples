@@ -6,7 +6,7 @@ using JasonShave.Azure.Communication.Service.EventHandler.CallingServer;
 using JasonShave.Azure.Communication.Service.EventHandler.JobRouter;
 using JasonShave.Azure.Communication.Service.JobRouter.Sdk.Contracts.V2021_10_20_preview.Events;
 
-namespace InboundCalling.Sample;
+namespace InboundCall.JobRouter.CallTransfer.Sample;
 
 public class MidCallEventHandler : BackgroundService
 {

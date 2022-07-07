@@ -2,7 +2,7 @@ using Azure.Communication.CallingServer;
 using Azure.Communication.JobRouter;
 using Azure.Messaging;
 using Azure.Messaging.EventGrid;
-using InboundCalling.Sample;
+using InboundCall.JobRouter.CallTransfer.Sample;
 using JasonShave.Azure.Communication.Service.EventHandler;
 using JasonShave.Azure.Communication.Service.EventHandler.CallingServer;
 using JasonShave.Azure.Communication.Service.EventHandler.JobRouter;
@@ -14,11 +14,8 @@ builder.Services.AddEventHandlerServices(option => option.PropertyNameCaseInsens
     .AddCallingServerEventHandling()
     .AddJobRouterEventHandling();
 
-builder.Services.AddSingleton(new CallingServerClient(
-    new Uri(builder.Configuration["CallingServerClientSettings:PmaEndpoint"]), 
-    builder.Configuration["CallingServerClientSettings:ConnectionString"]));
-
-builder.Services.AddSingleton(new RouterClient(builder.Configuration["RouterClient:ConnectionString"]));
+builder.Services.AddSingleton(new CallingServerClient(builder.Configuration["ACS:ConnectionString"]));
+builder.Services.AddSingleton(new RouterClient(builder.Configuration["ACS:ConnectionString"]));
 
 builder.Services.AddSingleton<IRepository<CallConnection>, MemoryRepository<CallConnection>>();
 builder.Services.AddSingleton<IRepository<RouterJob>, MemoryRepository<RouterJob>>();

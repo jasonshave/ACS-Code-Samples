@@ -1,7 +1,7 @@
 ﻿using Azure.Messaging.EventGrid;
 using Azure.Messaging.EventGrid.SystemEvents;
 
-namespace InboundCalling.Sample;
+namespace InboundCall.JobRouter.CallTransfer.Sample;
 
 // TODO: Seem to be a bug with this middleware as it always returns HTTP/400
 public class EventGridValidationMiddleware

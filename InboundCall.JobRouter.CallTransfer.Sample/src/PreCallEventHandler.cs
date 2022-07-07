@@ -4,7 +4,7 @@ using Azure.Communication.CallingServer;
 using JasonShave.Azure.Communication.Service.CallingServer.Sdk.Contracts.V2022_11_1_preview.Events;
 using JasonShave.Azure.Communication.Service.EventHandler.CallingServer;
 
-namespace InboundCalling.Sample;
+namespace InboundCall.JobRouter.CallTransfer.Sample;
 
 public class PreCallEventHandler : BackgroundService
 {

@@ -1,11 +1,12 @@
 ﻿using Azure.Communication.JobRouter;
 
-namespace InboundCalling.Sample;
+namespace InboundCall.JobRouter.CallTransfer.Sample;
 
 public static class ApplicationBuilderExtensions
 {
     public static IApplicationBuilder UseEventGridWebHookAutoValidation(this IApplicationBuilder app)
     {
+        // experimental
         app.UseMiddleware<EventGridValidationMiddleware>();
         return app;
     }
@@ -25,6 +26,7 @@ public static class ApplicationBuilderExtensions
         // set up VIP queue
         JobQueue queue = await routerClient.CreateQueueAsync("Alaska_VIP", distributionPolicy.Id);
 
+        // clean up from previous runs
         var allActiveJobs = routerClient.GetJobsAsync(new GetJobsOptions() { Status = JobStateSelector.Assigned });
         await foreach (var jobPage in allActiveJobs.AsPages(pageSizeHint: 100))
         {

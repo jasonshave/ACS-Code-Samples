@@ -1,4 +1,4 @@
-﻿namespace InboundCalling.Sample;
+﻿namespace InboundCall.JobRouter.CallTransfer.Sample;
 
 public interface IRepository<T>
 {
