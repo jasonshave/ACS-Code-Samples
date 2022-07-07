@@ -6,7 +6,7 @@ This repo contains a collection of code samples for Azure Communication Services
 
 ## InboundCall.JobRouter.CallTransfer.Sample
 
-This [sample](/InboundCall.JobRouter.CallTransfer.Sample/src/) orchestrates the following:
+This [sample](/InboundCall.JobRouter.CallTransfer.Sample/) orchestrates the following:
 
 1. An Event Grid `IncomingCall` event is received by an HTTP endpoint then published/dispatched and sent to the `PreCallEventHandler` where the `CallingServer` SDK answers it while providing a callback URI.
 2. An event is raised by ACS and sent to the callback URI above. The HTTP endpoint publishes the event which is dispatched to the `MidCallEventHandler` where it subscribes and invokes a method to create a Job in Job Router.
