@@ -19,7 +19,7 @@ public class MidCallEventHandler : BackgroundService
     private readonly ILogger<MidCallEventHandler> _logger;
 
     private const string _transferMri = "[ENTER_YOUR_TRANSFER_MRI_HERE]";
-    
+
     public MidCallEventHandler(
         IRepository<CallConnection> activeCallsRepository,
         IRepository<RouterJob> activeJobsRepository,
@@ -79,7 +79,7 @@ public class MidCallEventHandler : BackgroundService
         if (callState.CallConnectionState.ToLower() == "disconnected")
         {
             await _activeCallsRepository.Remove(contextId);
-            
+
             // TODO: clean up Job Router
         }
 

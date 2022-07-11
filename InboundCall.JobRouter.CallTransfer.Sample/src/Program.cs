@@ -41,12 +41,12 @@ app.UseHttpsRedirection();
 
 app.MapPost("/api/incomingCall", (
     [FromBody] EventGridEvent[] eventGridEvents,
-    [FromServices] IEventPublisher<CallingServer> publisher,
-    [FromServices] CallingServerClient callingServerClient) => 
+    [FromServices] IEventPublisher<Calling> publisher,
+    [FromServices] CallingServerClient callingServerClient) =>
 {
     foreach (var eventGridEvent in eventGridEvents)
     {
-        publisher.Publish(eventGridEvent.Data, eventGridEvent.EventType, Guid.NewGuid().ToString());
+        publisher.Publish(eventGridEvent.Data.ToString(), eventGridEvent.EventType);
     }
 
     return Results.Ok();
@@ -54,11 +54,11 @@ app.MapPost("/api/incomingCall", (
 
 app.MapPost("/api/jobRouter", (
     [FromBody] EventGridEvent[] eventGridEvents,
-    [FromServices] IEventPublisher<JobRouter> publisher) =>
+    [FromServices] IEventPublisher<Router> publisher) =>
 {
     foreach (var eventGridEvent in eventGridEvents)
     {
-        publisher.Publish(eventGridEvent.Data, eventGridEvent.EventType);
+        publisher.Publish(eventGridEvent.Data.ToString(), eventGridEvent.EventType);
     }
 
     return Results.Ok();
@@ -67,11 +67,11 @@ app.MapPost("/api/jobRouter", (
 app.MapPost("/api/calls/{contextId}", (
     [FromBody] CloudEvent[] cloudEvent,
     [FromRoute] string contextId,
-    [FromServices] IEventPublisher<CallingServer> publisher) =>
+    [FromServices] IEventPublisher<Calling> publisher) =>
 {
     foreach (var @event in cloudEvent)
     {
-        publisher.Publish(@event.Data, @event.Type, contextId);
+        publisher.Publish(@event.Data.ToString(), @event.Type, contextId);
     }
 
     return Results.Ok();

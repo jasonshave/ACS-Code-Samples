@@ -2,7 +2,7 @@
 
 public class MemoryRepository<TPrimitive> : IRepository<TPrimitive>
 {
-    private readonly Dictionary<string, TPrimitive> _store = new ();
+    private readonly Dictionary<string, TPrimitive> _store = new();
 
     public Task Save(TPrimitive data, string contextId)
     {
