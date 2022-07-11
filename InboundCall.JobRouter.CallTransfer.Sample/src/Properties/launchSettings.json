@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "InteractionEventHandler": {
+    "InboundCall.JobRouter.CallTransfer.Sample": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
