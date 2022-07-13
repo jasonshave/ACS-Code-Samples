@@ -1,16 +1,16 @@
 ﻿namespace InboundCall.JobRouter.CallTransfer.Sample;
 
-public class MemoryRepository<TPrimitive> : IRepository<TPrimitive>
+public class MemoryRepository<TData> : IRepository<TData>
 {
-    private readonly Dictionary<string, TPrimitive> _store = new();
+    private readonly Dictionary<string, TData> _store = new();
 
-    public Task Save(TPrimitive data, string contextId)
+    public Task Save(TData data, string contextId)
     {
         _store.Add(contextId, data);
         return Task.CompletedTask;
     }
 
-    public Task<TPrimitive?> Get(string contextId)
+    public Task<TData?> Get(string contextId)
     {
         return Task.Run(() =>
         {
