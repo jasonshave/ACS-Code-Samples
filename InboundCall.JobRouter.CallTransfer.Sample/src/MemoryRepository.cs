@@ -1,6 +1,7 @@
 ﻿namespace InboundCall.JobRouter.CallTransfer.Sample;
 
 public class MemoryRepository<TData> : IRepository<TData>
+    where TData : class
 {
     private readonly Dictionary<string, TData> _dataStore = new();
 
