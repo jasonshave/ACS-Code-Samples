@@ -48,7 +48,7 @@ public class PreCallEventHandler : BackgroundService
             var existingCall = await _activeCallsRepository.Get(@event.CorrelationId);
             if (existingCall is null)
             {
-                var callsEndpoint = new Uri(_callbackUri + contextId);
+                var callsEndpoint = new Uri(_callbackUri + @event.CorrelationId);
                 CallConnection callConnection = await _client.AnswerCallAsync(@event.IncomingCallContext, callsEndpoint);
                 await _activeCallsRepository.Save(callConnection, @event.CorrelationId);
 

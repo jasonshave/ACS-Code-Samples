@@ -56,31 +56,43 @@ public class MidCallEventHandler : BackgroundService
         }
     }
 
-    private ValueTask HandleJobClosed(RouterJobClosed routerJobClosed, string? contextId)
+    private async ValueTask HandleJobClosed(RouterJobClosed routerJobClosed, string? contextId)
     {
         _logger.LogInformation($"Job closed: {routerJobClosed.JobId}");
-        return ValueTask.CompletedTask;
+
+        await _activeJobsRepository.Remove(routerJobClosed.JobId);
     }
 
-    private ValueTask HandleJobCompleted(RouterJobCompleted routerJobCompleted, string? contextId)
+    private async ValueTask HandleJobCompleted(RouterJobCompleted routerJobCompleted, string? contextId)
     {
+        await _routerClient.CloseJobAsync(routerJobCompleted.JobId, routerJobCompleted.AssignmentId);
         _logger.LogInformation($"Job completed: {routerJobCompleted.JobId}");
-        return ValueTask.CompletedTask;
     }
 
     private async ValueTask HandleOnCallConnectionStateChanged(CallConnectionStateChanged callState, string? contextId)
     {
-        if (callState.CallConnectionState.ToLower() == "connected")
+        switch (callState.CallConnectionState.ToLower())
         {
-            RouterJob routerJob = await _routerClient.CreateJobAsync(contextId, "Voice", "Alaska_VIP");
-            await _activeJobsRepository.Save(routerJob, contextId);
-        }
+            case "connected":
+            {
+                RouterJob routerJob = await _routerClient.CreateJobAsync(contextId, "Voice", "Alaska_VIP");
+                await _activeJobsRepository.Save(routerJob, contextId);
+                break;
+            }
+            case "disconnected":
+            {
+                await _activeCallsRepository.Remove(contextId);
 
-        if (callState.CallConnectionState.ToLower() == "disconnected")
-        {
-            await _activeCallsRepository.Remove(contextId);
+                // complete the job since the call has been disconnected
+                var existingJob = await _activeJobsRepository.Get(contextId);
+                if (existingJob is not null)
+                {
+                    // job exists in local repo; complete it
+                    await _routerClient.CompleteJobAsync(existingJob.Id, existingJob.Assignments.Keys.FirstOrDefault());
+                }
 
-            // TODO: clean up Job Router
+                break;
+            }
         }
 
         _logger.LogInformation($"Call state: {callState.CallConnectionState} | Call connection ID: {callState.CallConnectionId} | Context ID: {contextId}");
@@ -89,7 +101,7 @@ public class MidCallEventHandler : BackgroundService
     private async ValueTask HandleOfferIssued(RouterWorkerOfferIssued offerIssued, string? contextId)
     {
         //check if call is still active
-        CallConnection? callConnection = await _activeCallsRepository.Get(offerIssued.JobId);
+        var callConnection = await _activeCallsRepository.Get(offerIssued.JobId);
 
         if (callConnection is not null)
         {
@@ -107,7 +119,7 @@ public class MidCallEventHandler : BackgroundService
     private async ValueTask HandleOfferAccepted(RouterWorkerOfferAccepted offerAccepted, string? contextId)
     {
         // Transfer active call to Frank
-        CallConnection? callConnection = await _activeCallsRepository.Get(offerAccepted.JobId);
+        var callConnection = await _activeCallsRepository.Get(offerAccepted.JobId);
         if (callConnection is not null)
         {
             await callConnection.TransferCallToParticipantAsync(
