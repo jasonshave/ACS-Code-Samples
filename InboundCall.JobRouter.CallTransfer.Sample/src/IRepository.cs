@@ -2,7 +2,7 @@
 
 public interface IRepository<TData>
 {
-    Task Save(TData data, string contextId);
-    Task<TData?> Get(string contextId);
-    Task Remove(string contextId);
+    Task Save(TData data, string id);
+    Task<TData?> Get(string id);
+    Task Remove(string id);
 }

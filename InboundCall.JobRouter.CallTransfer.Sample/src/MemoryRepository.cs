@@ -2,26 +2,26 @@
 
 public class MemoryRepository<TData> : IRepository<TData>
 {
-    private readonly Dictionary<string, TData> _store = new();
+    private readonly Dictionary<string, TData> _dataStore = new();
 
-    public Task Save(TData data, string contextId)
+    public Task Save(TData data, string id)
     {
-        _store.Add(contextId, data);
+        _dataStore.Add(id, data);
         return Task.CompletedTask;
     }
 
-    public Task<TData?> Get(string contextId)
+    public Task<TData?> Get(string id)
     {
         return Task.Run(() =>
         {
-            _store.TryGetValue(contextId, out var value);
+            _dataStore.TryGetValue(id, out var value);
             return value;
         });
     }
 
-    public Task Remove(string contextId)
+    public Task Remove(string id)
     {
-        _store.Remove(contextId);
+        _dataStore.Remove(id);
         return Task.CompletedTask;
     }
 }
