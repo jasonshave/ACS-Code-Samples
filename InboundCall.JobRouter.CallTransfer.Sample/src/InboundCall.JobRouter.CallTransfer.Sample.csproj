@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Communication.CallingServer" Version="1.0.0-alpha.20220715.1" />
-    <PackageReference Include="Azure.Communication.JobRouter" Version="1.0.0-alpha.20220703.1" />
+    <PackageReference Include="Azure.Communication.JobRouter" Version="1.0.0-alpha.20220722.9" />
     <PackageReference Include="Azure.Messaging.EventGrid" Version="4.10.0" />
     <PackageReference Include="JasonShave.Azure.Communication.Service.EventHandler.CallingServer" Version="1.0.0-alpha-2022-07-18.1" />
     <PackageReference Include="JasonShave.Azure.Communication.Service.EventHandler.JobRouter" Version="1.0.0-alpha-2022-07-18.1" />
