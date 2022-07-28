@@ -39,7 +39,7 @@ public static class ApplicationBuilderExtensions
             {
                 var assignmentId = job.RouterJob.Assignments.First().Value.Id;
                 await routerClient.CompleteJobAsync(new CompleteJobOptions(job.RouterJob.Id, assignmentId));
-                await Task.Delay(5000);
+                await Task.Delay(8000);
                 await routerClient.CloseJobAsync(new CloseJobOptions(job.RouterJob.Id, assignmentId));
             }
         }

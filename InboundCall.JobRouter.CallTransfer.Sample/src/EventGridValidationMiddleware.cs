@@ -12,35 +12,25 @@ public class EventGridValidationMiddleware
 
     public async Task InvokeAsync(HttpContext httpContext)
     {
-        try
-        {
-            BinaryData events = await BinaryData.FromStreamAsync(httpContext.Request.Body);
-            EventGridEvent[] eventGridEvents = EventGridEvent.ParseMany(events);
+        BinaryData events = await BinaryData.FromStreamAsync(httpContext.Request.Body);
+        EventGridEvent[] eventGridEvents = EventGridEvent.ParseMany(events);
 
-            foreach (EventGridEvent eventGridEvent in eventGridEvents)
+        foreach (EventGridEvent eventGridEvent in eventGridEvents)
+        {
+            // Handle system events
+            if (eventGridEvent.TryGetSystemEventData(out object eventData))
             {
-                // Handle system events
-                if (eventGridEvent.TryGetSystemEventData(out object eventData))
+                // Handle the subscription validation event
+                if (eventData is SubscriptionValidationEventData subscriptionValidationEventData)
                 {
-                    // Handle the subscription validation event
-                    if (eventData is SubscriptionValidationEventData subscriptionValidationEventData)
+                    var responseData = new SubscriptionValidationResponse()
                     {
-                        var responseData = new SubscriptionValidationResponse()
-                        {
-                            ValidationResponse = subscriptionValidationEventData.ValidationCode
-                        };
-                        await httpContext.Response.WriteAsJsonAsync(responseData);
-                    }
+                        ValidationResponse = subscriptionValidationEventData.ValidationCode
+                    };
+                    await httpContext.Response.WriteAsJsonAsync(responseData);
                 }
             }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-        finally
-        {
+
             await _next(httpContext);
         }
     }
