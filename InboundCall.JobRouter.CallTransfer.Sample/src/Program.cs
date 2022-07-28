@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Azure.Communication.CallingServer;
 using Azure.Communication.JobRouter;
+using Azure.Communication.JobRouter.Models;
 using Azure.Messaging;
 using Azure.Messaging.EventGrid;
 using InboundCall.JobRouter.CallTransfer.Sample;
@@ -17,6 +18,7 @@ builder.Services.AddEventHandlerServices(option => option.PropertyNameCaseInsens
 
 builder.Services.AddSingleton(new CallingServerClient(builder.Configuration["ACS:ConnectionString"]));
 builder.Services.AddSingleton(new RouterClient(builder.Configuration["ACS:ConnectionString"]));
+builder.Services.AddSingleton(new RouterAdministrationClient(builder.Configuration["ACS:ConnectionString"]));
 
 builder.Services.AddSingleton<IRepository<CallConnection>, MemoryRepository<CallConnection>>();
 builder.Services.AddSingleton<IRepository<RouterJob>, MemoryRepository<RouterJob>>();

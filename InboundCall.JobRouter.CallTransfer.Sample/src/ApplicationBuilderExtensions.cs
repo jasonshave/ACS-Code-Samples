@@ -1,4 +1,5 @@
 ﻿using Azure.Communication.JobRouter;
+using Azure.Communication.JobRouter.Models;
 
 namespace InboundCall.JobRouter.CallTransfer.Sample;
 
@@ -19,12 +20,16 @@ public static class ApplicationBuilderExtensions
         var routerClient = app.ApplicationServices.GetService<RouterClient>();
         if (routerClient is null) throw new ArgumentNullException(nameof(routerClient));
 
+        var routerAdminClient = app.ApplicationServices.GetService<RouterAdministrationClient>();
+        if (routerAdminClient is null) throw new ArgumentNullException(nameof(routerAdminClient));
+
         // set up distribution policy
-        DistributionPolicy distributionPolicy = await routerClient.CreateDistributionPolicyAsync("AlaskaAir_30s_RoundRobin", 30, new RoundRobinMode());
-        logger.LogInformation($"Distribution policy {distributionPolicy.Id} created.");
+        var distributionPolicy = await routerAdminClient.CreateDistributionPolicyAsync(
+            new CreateDistributionPolicyOptions("AlaskaAir_30s_RoundRobin", TimeSpan.FromSeconds(30), new RoundRobinMode()));
+        logger.LogInformation($"Distribution policy {distributionPolicy.Value.Id} created.");
 
         // set up VIP queue
-        JobQueue queue = await routerClient.CreateQueueAsync("Alaska_VIP", distributionPolicy.Id);
+        var queue = await routerAdminClient.CreateQueueAsync(new CreateQueueOptions("Alaska_VIP", distributionPolicy.Value.Id));
 
         // clean up from previous runs
         var allActiveJobs = routerClient.GetJobsAsync(new GetJobsOptions() { Status = JobStateSelector.Assigned });
@@ -32,15 +37,15 @@ public static class ApplicationBuilderExtensions
         {
             foreach (var job in jobPage.Values)
             {
-                var assignmentId = job.Assignments.First().Value.Id;
-                await routerClient.CompleteJobAsync(job.Id, assignmentId);
+                var assignmentId = job.RouterJob.Assignments.First().Value.Id;
+                await routerClient.CompleteJobAsync(new CompleteJobOptions(job.RouterJob.Id, assignmentId));
                 await Task.Delay(8000);
-                await routerClient.CloseJobAsync(job.Id, assignmentId);
+                await routerClient.CloseJobAsync(new CloseJobOptions(job.RouterJob.Id, assignmentId));
             }
         }
 
         // register a Worker
-        RouterWorker worker = await routerClient.CreateWorkerAsync("Frank", 100, new CreateWorkerOptions()
+        RouterWorker worker = await routerClient.CreateWorkerAsync(new CreateWorkerOptions("Frank", 100)
         {
             AvailableForOffers = true,
             ChannelConfigurations = new Dictionary<string, ChannelConfiguration>()

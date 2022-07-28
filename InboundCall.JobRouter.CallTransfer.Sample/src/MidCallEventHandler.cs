@@ -1,6 +1,7 @@
 ﻿using Azure.Communication;
 using Azure.Communication.CallingServer;
 using Azure.Communication.JobRouter;
+using Azure.Communication.JobRouter.Models;
 using JasonShave.Azure.Communication.Service.CallingServer.Sdk.Contracts.V2022_11_1_preview.Events;
 using JasonShave.Azure.Communication.Service.EventHandler.CallingServer;
 using JasonShave.Azure.Communication.Service.EventHandler.JobRouter;
@@ -81,7 +82,7 @@ public class MidCallEventHandler : BackgroundService
 
     private async ValueTask HandleJobCompleted(RouterJobCompleted routerJobCompleted, string? contextId)
     {
-        await _routerClient.CloseJobAsync(routerJobCompleted.JobId, routerJobCompleted.AssignmentId);
+        await _routerClient.CloseJobAsync(new CloseJobOptions(routerJobCompleted.JobId, routerJobCompleted.AssignmentId));
         _logger.LogInformation($"Job completed: {routerJobCompleted.JobId}");
     }
 
@@ -108,7 +109,7 @@ public class MidCallEventHandler : BackgroundService
         if (existingJob is not null)
         {
             // job exists in local repo; complete it
-            await _routerClient.CompleteJobAsync(existingJob.Id, existingJob.Assignments.Keys.FirstOrDefault());
+            await _routerClient.CompleteJobAsync(new CompleteJobOptions(existingJob.Id, existingJob.Assignments.Keys.FirstOrDefault()));
         }
 
         _logger.LogInformation($"Call state: Disconnected | Call connection ID: {callDisconnected.CallConnectionId} | Context ID: {contextId}");
@@ -127,7 +128,7 @@ public class MidCallEventHandler : BackgroundService
         }
         else
         {
-            await _routerClient.CancelJobAsync(offerIssued.JobId);
+            await _routerClient.CancelJobAsync(new CancelJobOptions(offerIssued.JobId));
             _logger.LogInformation($"Cancelled stale call {offerIssued.JobId}");
         }
     }
