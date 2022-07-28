@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Azure.Communication.CallingServer;
 using Azure.Communication.JobRouter;
 using Azure.Messaging;
@@ -22,6 +23,7 @@ builder.Services.AddSingleton<IRepository<RouterJob>, MemoryRepository<RouterJob
 
 builder.Services.AddHostedService<MidCallEventHandler>();
 builder.Services.AddHostedService<PreCallEventHandler>();
+builder.Services.AddHostedService<TelemetryHandler>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -64,12 +66,18 @@ app.MapPost("/api/jobRouter", (
     return Results.Ok();
 }).Produces(StatusCodes.Status200OK);
 
-app.MapPost("/api/calls/{contextId}", (
-    [FromBody] CloudEvent[] cloudEvent,
+app.MapPost("/api/calls/{contextId}", async (
+    HttpRequest request,
     [FromRoute] string contextId,
     [FromServices] IEventPublisher<Calling> publisher) =>
 {
-    foreach (var @event in cloudEvent)
+    // get body from HttpRequest
+    string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+
+    // deserialize into an array of CloudEvent types
+    CloudEvent[] cloudEvents = JsonSerializer.Deserialize<CloudEvent[]>(requestBody);
+
+    foreach (var @event in cloudEvents)
     {
         publisher.Publish(@event.Data.ToString(), @event.Type, contextId);
     }

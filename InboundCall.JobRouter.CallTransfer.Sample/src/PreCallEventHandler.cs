@@ -1,4 +1,5 @@
-﻿using Azure.Communication.CallingServer;
+﻿using Azure.Communication;
+using Azure.Communication.CallingServer;
 using JasonShave.Azure.Communication.Service.CallingServer.Sdk.Contracts.V2022_11_1_preview.Events;
 using JasonShave.Azure.Communication.Service.EventHandler.CallingServer;
 
@@ -49,13 +50,14 @@ public class PreCallEventHandler : BackgroundService
             if (existingCall is null)
             {
                 var callsEndpoint = new Uri(_callbackUri + @event.CorrelationId);
-                CallConnection callConnection = await _client.AnswerCallAsync(@event.IncomingCallContext, callsEndpoint);
-                await _activeCallsRepository.Save(callConnection, @event.CorrelationId);
+
+                AnswerCallResult answerCallResult = await _client.AnswerCallAsync(@event.IncomingCallContext, callsEndpoint);
+                await _activeCallsRepository.Save(answerCallResult.CallConnection, @event.CorrelationId);
 
                 _logger.LogInformation($"Answered call from: {@event.From.RawId} to: {@event.To.RawId}");
             }
 
-            // ignore due to re-answer issue
+            // ignore since the IncomingCall may be a redirected or forwarded call
         }
         catch (Exception e)
         {
